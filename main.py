@@ -19,7 +19,8 @@ clock = pygame.time.Clock()
 running = True
 
 csp = CrosswordCSP(puzzle)
-csp.solve()
+assignment = csp.solve()
+print(f'puzzle accuracy: {csp.getAccuracy(assignment)}')
 
 while running:
     # poll for events

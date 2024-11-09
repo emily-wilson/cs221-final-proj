@@ -69,11 +69,43 @@ class CrosswordCSP:
                 self.__add_binary_constraint(v1, v2, lambda c1, c2: c1[intersection[0]] == c2[intersection[1]])
 
     # Get the next variable to assign for the given assignment using the provided strategy
-    def __get_variable(self, assignment, strategy = "mcv"):
-        available_clues = self.puzzle.clues.keys() - assignment.keys
+    def __get_variable(self, assignment, answer_domains, strategy = "mcv"):
+        available_clues = self.puzzle.clues.keys() - assignment.keys()
+        if strategy == "mcv":
+            mcv = None
+            for clue in available_clues:
+                ans_passing_constraints = set()
+                for ans in answer_domains:
+                    for constraint in self.unary_constraints[clue]:
+                        if constraint(ans):
+                            ans_passing_constraints.add(ans)
+                if len(ans_passing_constraints) != 0 and (mcv is None or len(ans_passing_constraints) < mcv[1]):
+                    mcv = (clue, len(ans_passing_constraints))
+            return mcv[0]
         return random.choice(available_clues)
 
     def solve(self):
-        assignment = []
+        assignment = {}
         answer_domains = self.domain_gen.generate_domains(self.puzzle.clues)
-        print(assignment)
+        partial_answers = {}
+        while len(assignment.keys()) < len(self.puzzle.clues.keys()):
+            next_var = self.__get_variable(assignment, answer_domains)
+            if len(answer_domains[next_var]) == 0:
+                continue
+            assignment[next_var] = answer_domains[next_var].pop()
+            # print(next_var, answer_domains[next_var].pop())
+            self.puzzle.answer(next_var, assignment[next_var])
+        return assignment
+
+    def getAccuracy(self, assignment):
+        correct_answers = 0
+        for key in assignment.keys():
+            if assignment[key] == self.puzzle.answers[key]:
+                correct_answers += 1
+
+        correct_square = 0
+        for i in range(len(self.puzzle.grid)):
+            for j in range(len(self.puzzle.grid[0])):
+                if self.puzzle.grid[i][j] == self.puzzle.correct_grid[i][j]:
+                    correct_square += 1
+        return (correct_answers / len(self.puzzle.clues), correct_square / (len(self.puzzle.grid) * len(self.puzzle.grid[0])))
