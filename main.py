@@ -2,6 +2,7 @@
 import pygame
 
 import utils
+from classes.baseline_csp import BaselineCSP
 from classes.puzzle import Puzzle
 from classes.crossword_csp import CrosswordCSP
 import json
@@ -18,7 +19,7 @@ screen = pygame.display.set_mode(puzzle.getScreenSize())
 clock = pygame.time.Clock()
 running = True
 
-csp = CrosswordCSP(puzzle)
+csp = BaselineCSP(puzzle)
 assignment = csp.solve()
 print(f'puzzle accuracy: {csp.getAccuracy(assignment)}')
 
