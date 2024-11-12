@@ -2,9 +2,9 @@
 import pygame
 
 import utils
-from classes.baseline_csp import BaselineCSP
+from classes.csp import CSP
 from classes.puzzle import Puzzle
-from classes.crossword_csp import CrosswordCSP
+from classes.baseline_backtracking import BaselineBacktrackingSearch
 import json
 
 # pygame setup
@@ -19,9 +19,20 @@ screen = pygame.display.set_mode(puzzle.getScreenSize())
 clock = pygame.time.Clock()
 running = True
 
-csp = BaselineCSP(puzzle)
-assignment = csp.solve()
-print(f'puzzle accuracy: {csp.getAccuracy(assignment)}')
+csp = CSP(puzzle)
+backtracking = BaselineBacktrackingSearch(csp)
+assignments = backtracking.solve()
+
+best_assignment = None
+for assignment, score in assignments:
+    ans_acc, grid_acc = csp.getAccuracy(assignment)
+    if best_assignment is None or score > best_assignment[1]:
+        best_assignment = (assignment, score)
+    print(f'puzzle accuracy: {ans_acc},{grid_acc},{score}')
+
+for k, v in best_assignment[0].items():
+    puzzle.answer(k, v)
+
 
 while running:
     # poll for events

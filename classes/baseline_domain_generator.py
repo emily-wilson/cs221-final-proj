@@ -24,3 +24,30 @@ class BaselineDomainGenerator(LLMDomainGenerator):
                 domains[k].add(''.join(letter for letter in content if letter.isalnum()))
         print(domains)
         return domains
+
+    def __get_messages(self, clueKey, prevDomain):
+        prompt = {
+                    "role": "user",
+                    "content": f'{self.puzzle.ans_lens[clueKey]} letter word for \"{self.puzzle.clues[clueKey]}\"'
+                }
+        responses = [{"role": "assistant", "content": prevResp} for prevResp in prevDomain]
+        all_messages = [[prompt, response] for response in responses]
+        return [self.role] + [
+            m
+            for p in all_messages
+            for m in p] + [prompt]
+
+    def generate_single_domain(self, clueKey, prevDomain):
+        print(f'prompt: {self.puzzle.ans_lens[clueKey]} letter word for \"{self.puzzle.clues[clueKey]}\"')
+        domain = set()
+        completion = self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=self.__get_messages(clueKey, prevDomain),
+            n=utils.MAX_TOKENS,
+            frequency_penalty=2.0
+        )
+
+        for i in range(utils.MAX_TOKENS):
+            content = completion.choices[i].message.content.upper()
+            domain.add(''.join(letter for letter in content if letter.isalnum()))
+        return domain
