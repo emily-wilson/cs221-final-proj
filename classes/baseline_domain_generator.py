@@ -3,7 +3,7 @@ import utils
 
 
 class BaselineDomainGenerator(LLMDomainGenerator):
-    def generate_domains(self, clueKeys, partialAnswers = {}):
+    def generate_domains(self, clueKeys, partialAnswers = {}, num_responses = 4):
         domains = {}
         for k in clueKeys:
             print(f'prompt: {self.puzzle.ans_lens[k]} letter word for \"{self.puzzle.clues[k]}\"')
@@ -16,10 +16,10 @@ class BaselineDomainGenerator(LLMDomainGenerator):
                         "content": f'{self.puzzle.ans_lens[k]} letter word for \"{self.puzzle.clues[k]}\"'
                     }
                 ],
-                n = utils.MAX_TOKENS,
+                n = num_responses,
             )
             domains[k] = set()
-            for i in range(utils.MAX_TOKENS):
+            for i in range(num_responses):
                 content = completion.choices[i].message.content.upper()
                 domains[k].add(''.join(letter for letter in content if letter.isalnum()))
         print(domains)

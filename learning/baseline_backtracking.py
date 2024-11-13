@@ -51,9 +51,9 @@ class BaselineBacktrackingSearch:
                         dep_graph[m].add((n, intersection))
                         dep_graph[n].add((m, intersection))
 
-        for v1 in dep_graph:
-            for v2, intersection in dep_graph[v1]:
-                self.csp.add_binary_constraint(v1, v2, lambda c1, c2: 1 if (c1[intersection[0]] == c2[intersection[1]] or c1[intersection[0]] is None or c2[intersection[1]] is None) else 0.1)
+        # for v1 in dep_graph:
+        #     for v2, intersection in dep_graph[v1]:
+        #         self.csp.add_binary_constraint(v1, v2, lambda c1, c2: 1 if (c1[intersection[0]] == c2[intersection[1]] or c1[intersection[0]] is None or c2[intersection[1]] is None) else 0.1)
 
     def __get_hashable(self, assignment):
         return frozenset({(k, v) for k, v in assignment.items()})

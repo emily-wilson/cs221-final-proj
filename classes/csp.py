@@ -24,8 +24,8 @@ class CSP:
             self.binary_constraints[v1] = set()
         if v2 not in self.binary_constraints:
             self.binary_constraints[v2] = set()
-        self.binary_constraints[v1].add(func)
-        self.binary_constraints[v2].add(func)
+        self.binary_constraints[v1].add((v2, func))
+        self.binary_constraints[v2].add((v1, func))
 
     # Get the next variable to assign for the given assignment using the provided strategy
     def get_variable(self, assignment, domains, strategy="mcv"):
@@ -46,7 +46,10 @@ class CSP:
                 prod *= f(val)
         if var in self.binary_constraints:
             binary_constraints = self.binary_constraints[var]
-            print(f'num binary constraints: {len(binary_constraints)}')
+            for k, f in binary_constraints:
+                if k not in assignment:
+                    continue
+                prod *= f(val, assignment[k])
         return prod
 
     def getAccuracy(self, assignment):
