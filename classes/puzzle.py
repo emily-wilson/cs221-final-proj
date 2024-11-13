@@ -47,12 +47,13 @@ class Puzzle:
                 while i < len(self.grid) and self.grid[i][j] != '-':
                     self.correct_grid[i][j] = correct_answer[i - start_ind[0]]
                     i += 1
-                self.ans_lens[k] = i - start_ind[0]
+                self.ans_lens[k] = (i - start_ind[0]) + 1
             else:
                 while j < len(self.grid[0]) and self.grid[i][j] != '-':
                     self.correct_grid[i][j] = correct_answer[j - start_ind[1]]
                     j += 1
-                self.ans_lens[k] = j - start_ind[1]
+                self.ans_lens[k] = (j - start_ind[1]) + 1
+        print(f'ans_lens contains all answers: {self.ans_lens.keys() == self.clues.keys()}')
 
     ## Fill in the answer into the result puzzle
     def answer(self, clueNum: str, answer: str):
