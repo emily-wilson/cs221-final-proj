@@ -20,7 +20,7 @@ import random
 ans_accs = 0
 grid_accs = 0
 count = 0
-for i in range(1994, 2024):
+for i in range(1994, 2024, 4):
     filename = f'data/{i}/{random.randint(1, 12)}-{random.randint(1, 28)}-{i}.json'
     puzzle = Puzzle(filename)
     csp = CSP(puzzle)
@@ -37,7 +37,7 @@ for i in range(1994, 2024):
     grid_accs += grid_acc
     count += 1
 
-print(f'average grid acc: {grid_accs/count}, average ans acc: {ans_accs/count}')
+print(f'average grid acc: {grid_accs/count}, average ans acc: {ans_accs/count}, count: {count}')
 
 # best_assignment = None
 # for assignment, score in assignments:
