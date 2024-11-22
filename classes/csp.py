@@ -23,10 +23,10 @@ class CSP:
         # print(f'v1: {v1}, v2: {v2}, constraints: {self.binary_constraints}')
         if v1 not in self.binary_constraints:
             self.binary_constraints[v1] = set()
-        if v2 not in self.binary_constraints:
-            self.binary_constraints[v2] = set()
+        # if v2 not in self.binary_constraints:
+        #     self.binary_constraints[v2] = set()
         self.binary_constraints[v1].add((v2, func))
-        self.binary_constraints[v2].add((v1, func))
+        # self.binary_constraints[v2].add((v1, func))
 
     # Get the next variable to assign for the given assignment using the provided strategy
     def get_variable(self, assignment, domains, strategy="mcv"):

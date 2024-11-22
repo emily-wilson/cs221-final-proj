@@ -107,7 +107,7 @@ class Puzzle:
         c1_start = self.clue_inds[clue1[:-1]]
         c2_start = self.clue_inds[clue2[:-1]]
         if clue1[-1] == 'd':
-            return (abs(c1_start[1] - c2_start[0]), abs(c1_start[0] - c2_start[0]))
+            return (abs(c1_start[1] - c2_start[1]), abs(c1_start[0] - c2_start[0]))
         else:
             return (abs(c1_start[0] - c2_start[0]), abs(c1_start[1] - c2_start[1]))
 

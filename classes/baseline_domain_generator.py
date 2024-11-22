@@ -39,7 +39,7 @@ class BaselineDomainGenerator(LLMDomainGenerator):
             for m in p] + [prompt]
 
     def generate_single_domain(self, clueKey, prevDomain):
-        print(f'regenerating single domain for \"{self.puzzle.clues[clueKey]}\"')
+        # print(f'regenerating single domain for \"{self.puzzle.clues[clueKey]}\"')
         # print(self.__get_messages(clueKey, prevDomain))
         domain = set()
         completion = self.client.chat.completions.create(

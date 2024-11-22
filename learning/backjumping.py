@@ -41,25 +41,28 @@ class Backjumping:
                             continue
                         if m not in dep_graph:
                             dep_graph[m] = set()
-                        if n not in dep_graph:
-                            dep_graph[n] = set()
+                        # if n not in dep_graph:
+                        #     dep_graph[n] = set()
                         intersection = self.csp.puzzle.getIntersection(m, n)
                         dep_graph[m].add((n, intersection))
-                        dep_graph[n].add((m, intersection))
-        # print(f'dep graph: {dep_graph}')
+                        # dep_graph[n].add((m, intersection))
+        print(f'dep graph: {dep_graph}')
 
         def words_intersect(word1, word2, intersection):
             # print(word1, word2, intersection)
-            if intersection[0] >= len(word1) or intersection[1] >= len(word2):
+            if intersection[1] >= len(word1) or intersection[0] >= len(word2):
                 return 0.1
-            if word1[intersection[0]] is None or word2[intersection[1]] is None:
+            if word1[intersection[1]] is None or word2[intersection[0]] is None:
                 return 1
 
-            return 1 if word1[intersection[0]] == word2[intersection[1]] else 0.1
+            return 1 if word1[intersection[1]] == word2[intersection[0]] else 0.1
+
+        def get_intersection_lambda(intersection):
+            return lambda c1, c2: words_intersect(c1, c2, intersection)
 
         for v1 in dep_graph:
             for v2, intersection in dep_graph[v1]:
-                self.csp.add_binary_constraint(v1, v2, lambda c1, c2: words_intersect(c1, c2, intersection))
+                self.csp.add_binary_constraint(v1, v2, get_intersection_lambda(intersection))
 
     def __order_variables(self, domain):
         variable_ordering = PriorityQueue()
@@ -88,16 +91,17 @@ class Backjumping:
 
         print(f'assignment: {assignment}, potential incorrect: {self.potential_incorrect_answers}')
         i = 1
-        while i < 2 and len(self.potential_incorrect_answers) > 0:
+        while i < 4 and len(self.potential_incorrect_answers) > 0:
             new_flagged_answers = []
             for var in self.potential_incorrect_answers:
                 max_p = None
                 domain[var] = self.domain_gen.generate_single_domain(var, domain[var])
-                print(f'new domain: {domain[var]}')
+                # print(f'new domain: {domain[var]}')
                 for val in domain[var]:
                     p = self.csp.compute_weight(var, val, assignment)
                     if max_p is None or p > max_p[1]:
                         max_p = (val, p)
+                print(f'max_p: {max_p}')
                 if max_p[1] < 1/i:
                     new_flagged_answers.append(var)
                 else:
