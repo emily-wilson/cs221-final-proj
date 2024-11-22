@@ -5,7 +5,7 @@ import random
 from classes.priority_queue import PriorityQueue
 
 
-class AStartSearch:
+class AStarSearch:
     def __init__(self, csp):
         self.csp = csp
         self.domain_gen = BaselineDomainGenerator(csp.puzzle)
@@ -86,6 +86,7 @@ class AStartSearch:
 
             # variable = self.csp.get_variable(assignment, domains)
             # updated_domains = set(domains[variable])
+            max_v = None
             for val in domains[variable]:
                 p = self.csp.compute_weight(variable, val, assignment)
                 if p == 0:
@@ -101,9 +102,15 @@ class AStartSearch:
 
                 # next_assignment = assignment.copy()
                 # next_assignment[variable] = val
-                assignment[variable] = val
+                if max_v is None or p > max_v[1]:
+                    max_v = (val, p)
+
                 # if self.__get_hashable(next_assignment) not in visited:
                 #     stack.push(score * p, next_assignment)
+            if max_v is None:
+                assignment[variable] = domains[variable].pop()
+            else:
+                assignment[variable] = max_v[0]
             if num_iter >= utils.MAX_ITER:
                 return assignment, score
             print(len(stack))

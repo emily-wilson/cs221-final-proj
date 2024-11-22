@@ -47,16 +47,16 @@ class Puzzle:
                 while i < len(self.grid) and self.grid[i][j] != '-':
                     self.correct_grid[i][j] = correct_answer[i - start_ind[0]]
                     i += 1
-                self.ans_lens[k] = (i - start_ind[0]) + 1
+                self.ans_lens[k] = (i - start_ind[0])
             else:
                 while j < len(self.grid[0]) and self.grid[i][j] != '-':
                     self.correct_grid[i][j] = correct_answer[j - start_ind[1]]
                     j += 1
-                self.ans_lens[k] = (j - start_ind[1]) + 1
+                self.ans_lens[k] = (j - start_ind[1])
         print(f'ans_lens contains all answers: {self.ans_lens.keys() == self.clues.keys()}')
 
     ## Fill in the answer into the result puzzle
-    def answer(self, clueNum: str, answer: str):
+    def answer(self, clueNum: str, answer: str, force_clear=False):
         r, c = self.clue_inds[clueNum[:-1]]
 
         if clueNum[-1] == "a":
@@ -65,7 +65,7 @@ class Puzzle:
                     print('Answer length exceeds puzzle size!')
                 elif self.grid[r][c + i] == '-':
                     print('Answer does not fit in puzzle!')
-                elif len(self.grid[r][c+i]) == 0:
+                elif force_clear or len(self.grid[r][c+i]) == 0:
                     self.grid[r][c + i] = answer[i]
         elif clueNum[-1] == "d":
             for i in range(len(answer)):
@@ -73,7 +73,7 @@ class Puzzle:
                     print('Answer length exceeds puzzle size!')
                 elif self.grid[r + i][c] == '-':
                     print('Answer does not fit in puzzle!')
-                elif len(self.grid[r + i][c]) == 0:
+                elif force_clear or len(self.grid[r + i][c]) == 0:
                     self.grid[r + i][c] = answer[i]
 
     def render(self, surface: pygame.Surface, wordFont: pygame.font.Font, numFont: pygame.font.Font):

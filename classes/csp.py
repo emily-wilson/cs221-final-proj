@@ -20,6 +20,7 @@ class CSP:
         self.unary_constraints[variable].add(func)
 
     def add_binary_constraint(self, v1: str, v2: str, func: Callable):
+        # print(f'v1: {v1}, v2: {v2}, constraints: {self.binary_constraints}')
         if v1 not in self.binary_constraints:
             self.binary_constraints[v1] = set()
         if v2 not in self.binary_constraints:
@@ -39,17 +40,25 @@ class CSP:
         # print(f'available clues: {available_clues}')
         return random.choice(list(available_clues))
 
-    def compute_weight(self, var, val, assignment):
+    def compute_weight(self, var, val, assignment, sum_bin_constraints=False):
         prod = 1
         if var in self.unary_constraints:
             for f in self.unary_constraints[var]:
                 prod *= f(val)
+        bin_const_sum = 0
+        # print(f'binary constraints: {self.binary_constraints}')
         if var in self.binary_constraints:
             binary_constraints = self.binary_constraints[var]
+            # print(f'binary constraints: {binary_constraints}')
             for k, f in binary_constraints:
                 if k not in assignment:
                     continue
-                prod *= f(val, assignment[k])
+                if sum_bin_constraints:
+                    bin_const_sum += f(val, assignment[k])
+                else:
+                    prod *= f(val, assignment[k])
+        if sum_bin_constraints:
+            prod *= bin_const_sum
         return prod
 
     def getAccuracy(self, assignment):
