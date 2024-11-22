@@ -38,10 +38,28 @@ class BaselineDomainGenerator(LLMDomainGenerator):
             for p in all_messages
             for m in p] + [prompt]
 
-    def generate_single_domain(self, clueKey, prevDomain):
+    def generate_single_domain(self, clueKey, prevDomain, partial_answer=None):
         # print(f'regenerating single domain for \"{self.puzzle.clues[clueKey]}\"')
         # print(self.__get_messages(clueKey, prevDomain))
         domain = set()
+        if partial_answer:
+            substr = partial_answer.split(' ')[0]
+            completion = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                n=utils.MAX_TOKENS,
+                messages=[
+                    self.role,
+                    {
+                        "role": "user",
+                        "content": f'{self.puzzle.ans_lens[clueKey]} letter word for \"{self.puzzle.clues[clueKey]}\" containing the substring \"{substr}\"'
+                    }],
+            )
+            # print(f'completion: {completion}')
+            for i in range(utils.MAX_TOKENS):
+                content = completion.choices[i].message.content.upper()
+                domain.add(''.join(letter for letter in content if letter.isalnum()))
+            return domain
+
         completion = self.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=self.__get_messages(clueKey, prevDomain),

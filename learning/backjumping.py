@@ -1,7 +1,6 @@
 from classes.baseline_domain_generator import BaselineDomainGenerator
 from classes.priority_queue import PriorityQueue
 
-
 class Backjumping:
     def __init__(self, csp):
         self.csp = csp
@@ -88,6 +87,7 @@ class Backjumping:
                 self.potential_incorrect_answers.append(var)
             else:
                 assignment[var] = max_p[0]
+                self.csp.puzzle.answer(var, max_p[0])
 
         print(f'assignment: {assignment}, potential incorrect: {self.potential_incorrect_answers}')
         i = 1
@@ -95,7 +95,8 @@ class Backjumping:
             new_flagged_answers = []
             for var in self.potential_incorrect_answers:
                 max_p = None
-                domain[var] = self.domain_gen.generate_single_domain(var, domain[var])
+                domain[var] = self.domain_gen.generate_single_domain(var, domain[var], self.csp.puzzle.getPartialAnswer(var))
+                print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
                 # print(f'new domain: {domain[var]}')
                 for val in domain[var]:
                     p = self.csp.compute_weight(var, val, assignment)
@@ -106,6 +107,7 @@ class Backjumping:
                     new_flagged_answers.append(var)
                 else:
                     assignment[var] = max_p[0]
+                    self.csp.puzzle.answer(var, max_p[0])
             i += 1
             print(f'new flagged answers: ', new_flagged_answers)
             self.potential_incorrect_answers = new_flagged_answers

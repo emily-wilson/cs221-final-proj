@@ -44,8 +44,8 @@ backjumping = Backjumping(csp)
 assignment = backjumping.solve()
 print(assignment)
 
-for k, v in assignment.items():
-    puzzle.answer(k, v, force_clear=True)
+# for k, v in assignment.items():
+#     puzzle.answer(k, v, force_clear=True)
 
 ans_acc, grid_acc = csp.getAccuracy(assignment)
 print(f'puzzle accuracy: {ans_acc},{grid_acc}')

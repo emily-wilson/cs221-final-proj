@@ -115,13 +115,14 @@ class Puzzle:
         partial = ""
         start_ind = self.clue_inds[clue[:-1]]
         i, j = start_ind
-        if clue[-1] == 'd':
-            while i < len(self.grid) and len(self.grid[i][j]) != 0 and self.grid[i][j] != '-':
-                partial += self.grid[i][j]
-                i += 1
-            return partial
-        else:
-            while j < len(self.grid[0]) and len(self.grid[i][j]) != 0 and self.grid[i][j] != '-':
-                partial += self.grid[i][j]
-                j += 1
-            return partial
+        for x in range(self.ans_lens[clue]):
+            c = ' '
+            if clue[-1] == 'd':
+                c = self.grid[i+x][j]
+            else:
+                c= self.grid[i][j+x]
+            if len(c) > 0:
+                partial += c
+            else:
+                partial += ' '
+        return partial
