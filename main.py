@@ -13,52 +13,17 @@ import random
 pygame.init()
 pygame.font.init()
 
-
-
-
-
 baseline_ans_accs = 0
 baseline_grid_accs = 0
 astar_ans_acc = 0
 astar_grid_acc = 0
-count = 0
-# for i in range(1994, 2024, 40):
+count = 1
+
 filename = f'data/2024/1-1-2024.json'
 puzzle = Puzzle(filename)
 csp = CSP(puzzle)
 
-    # baseline = Baseline(csp)
-    # assignment, score = baseline.solve()
-    # print(assignment)
-    #
-    # for k, v in assignment.items():
-    #     puzzle.answer(k, v)
-    #
-    # ans_acc, grid_acc = csp.getAccuracy(assignment)
-    # print(f'puzzle accuracy: {ans_acc},{grid_acc},{score}')
-    # baseline_ans_accs += ans_acc
-    # baseline_grid_accs += grid_acc
-count += 1
-
 backjumping = Backjumping(csp)
-assignment = backjumping.solve()
-print(assignment)
-
-# for k, v in assignment.items():
-#     puzzle.answer(k, v, force_clear=True)
-
-ans_acc, grid_acc = csp.getAccuracy(assignment)
-print(f'puzzle accuracy: {ans_acc},{grid_acc}')
-astar_ans_acc += ans_acc
-astar_grid_acc += grid_acc
-
-# print(f'Baseline: average grid acc: {baseline_grid_accs/count}, average ans acc: {baseline_ans_accs/count}, count: {count}')
-print(f'Backjumping: average grid acc: {astar_grid_acc/count}, average ans acc: {astar_ans_acc/count}, count: {count}')
-
-# best_assignment = None
-# for assignment, score in assignments:
-#     if best_assignment is None or score > best_assignment[1]:
-#         best_assignment = (assignment, score)
 
 screen = pygame.display.set_mode(puzzle.getScreenSize())
 clock = pygame.time.Clock()
@@ -77,6 +42,15 @@ while running:
 
     text = word_font.render("hello", True, (255, 0, 0))
     screen.blit(text, (100, 100))
+
+    assignment = backjumping.solve_iter()
+
+    if assignment is not None:
+        ans_acc, grid_acc = csp.getAccuracy(assignment)
+        print(f'puzzle accuracy: {ans_acc},{grid_acc}')
+
+        print(
+            f'Backjumping: average grid acc: {grid_acc / count}, average ans acc: {ans_acc / count}, count: {count}')
 
     puzzle.render(screen, word_font, number_font)
 
