@@ -49,14 +49,15 @@ class CSP:
         # print(f'binary constraints: {self.binary_constraints}')
         if var in self.binary_constraints:
             binary_constraints = self.binary_constraints[var]
-            # print(f'binary constraints: {binary_constraints}')
+            print(f'binary constraints: {len(binary_constraints)}')
             for k, f in binary_constraints:
                 if k not in assignment:
-                    continue
-                if sum_bin_constraints:
+                    bin_const_sum += 1
+                elif sum_bin_constraints:
                     bin_const_sum += f(val, assignment[k])
                 else:
                     prod *= f(val, assignment[k])
+        print(f'var: {var}, val: {val}, sum: {bin_const_sum}')
         if sum_bin_constraints:
             prod *= bin_const_sum
         return prod

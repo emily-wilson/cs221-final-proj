@@ -54,7 +54,7 @@ class Backjumping:
             if word1[intersection[1]] is None or word2[intersection[0]] is None:
                 return 1
 
-            return 1 if word1[intersection[1]] == word2[intersection[0]] else 0.1
+            return 1 if word1[intersection[1]] == word2[intersection[0]] else 0
 
         def get_intersection_lambda(intersection):
             return lambda c1, c2: words_intersect(c1, c2, intersection)
@@ -79,11 +79,11 @@ class Backjumping:
             priority, var = variable_ordering.pop()
             max_p = None
             for val in domain[var]:
-                p = self.csp.compute_weight(var, val, assignment)
+                p = self.csp.compute_weight(var, val, assignment, sum_bin_constraints=True)
                 if max_p is None or p > max_p[1]:
                     max_p = (val, p)
             # print(f'max_p = {max_p}')
-            if max_p[1] < 1:
+            if max_p[1] < self.csp.puzzle.ans_lens[var]:
                 self.potential_incorrect_answers.append(var)
             else:
                 assignment[var] = max_p[0]
@@ -99,11 +99,11 @@ class Backjumping:
                 print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
                 # print(f'new domain: {domain[var]}')
                 for val in domain[var]:
-                    p = self.csp.compute_weight(var, val, assignment)
+                    p = self.csp.compute_weight(var, val, assignment, sum_bin_constraints=True)
                     if max_p is None or p > max_p[1]:
                         max_p = (val, p)
                 print(f'max_p: {max_p}')
-                if max_p[1] < 1/i:
+                if max_p[1] < self.csp.puzzle.ans_lens[var]:
                     new_flagged_answers.append(var)
                 else:
                     assignment[var] = max_p[0]
