@@ -38,12 +38,19 @@ class BaselineDomainGenerator(LLMDomainGenerator):
             for p in all_messages
             for m in p] + [prompt]
 
+    def __get_longest_partial_substring(self, partial):
+        substrs = filter(lambda sub: len(sub) > 0, partial.split(' '))
+        longest = ''
+        for sub in substrs:
+            if len(sub) > len(longest):
+                longest = sub
+        return longest
+
     def generate_single_domain(self, clueKey, prevDomain, partial_answer=None):
         # print(f'regenerating single domain for \"{self.puzzle.clues[clueKey]}\"')
         # print(self.__get_messages(clueKey, prevDomain))
         domain = set()
         if partial_answer:
-            substr = partial_answer.split(' ')[0]
             completion = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 n=utils.MAX_TOKENS,
@@ -51,7 +58,7 @@ class BaselineDomainGenerator(LLMDomainGenerator):
                     self.role,
                     {
                         "role": "user",
-                        "content": f'{self.puzzle.ans_lens[clueKey]} letter word for \"{self.puzzle.clues[clueKey]}\" containing the substring \"{substr}\"'
+                        "content": f'{self.puzzle.ans_lens[clueKey]} letter word for \"{self.puzzle.clues[clueKey]}\" containing the substring \"{self.__get_longest_partial_substring(partial_answer)}\"'
                     }],
             )
             # print(f'completion: {completion}')
