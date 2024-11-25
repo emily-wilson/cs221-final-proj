@@ -19,7 +19,9 @@ astar_ans_acc = 0
 astar_grid_acc = 0
 count = 1
 
-filename = f'data/2024/1-1-2024.json'
+year = random.randint(1994, 2024)
+filename = f'data/{year}/{random.randint(1, 12)}-{random.randint(1, 28)}-{year}.json'
+print(filename)
 puzzle = Puzzle(filename)
 csp = CSP(puzzle)
 

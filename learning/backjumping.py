@@ -145,13 +145,13 @@ class Backjumping:
             max_p = None
             self.domain[var] = self.domain_gen.generate_single_domain(var, self.domain[var],
                                                                  self.csp.puzzle.getPartialAnswer(var))
-            print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
+            # print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
             # print(f'new domain: {domain[var]}')
             for val in self.domain[var]:
                 p = self.csp.compute_weight(var, val, self.assignment, sum_bin_constraints=True)
                 if max_p is None or p > max_p[1]:
                     max_p = (val, p)
-            print(f'max_p: {max_p}')
+            # print(f'max_p: {max_p}')
             if max_p[1] < self.csp.puzzle.ans_lens[var]:
                 self.new_flagged_answers.append(var)
             else:
