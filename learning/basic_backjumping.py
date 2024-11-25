@@ -1,7 +1,7 @@
 from classes.baseline_domain_generator import BaselineDomainGenerator
 from classes.priority_queue import PriorityQueue
 
-class Backjumping:
+class BasicBackjumping:
     def __init__(self, csp):
         self.csp = csp
         self.domain_gen = BaselineDomainGenerator(csp.puzzle)
@@ -42,11 +42,8 @@ class Backjumping:
                             continue
                         if m not in dep_graph:
                             dep_graph[m] = set()
-                        # if n not in dep_graph:
-                        #     dep_graph[n] = set()
                         intersection = self.csp.puzzle.getIntersection(m, n)
                         dep_graph[m].add((n, intersection))
-                        # dep_graph[n].add((m, intersection))
         print(f'dep graph: {dep_graph}')
 
         def words_intersect(word1, word2, intersection):
@@ -65,7 +62,7 @@ class Backjumping:
             for v2, intersection in dep_graph[v1]:
                 self.csp.add_binary_constraint(v1, v2, get_intersection_lambda(intersection))
 
-    def __order_variables(self, domain):
+    def __order_variables__(self, domain):
         variable_ordering = PriorityQueue()
         for variable in domain.keys():
             variable_ordering.push(-len(domain[variable]), variable)
@@ -73,7 +70,7 @@ class Backjumping:
 
     def solve(self):
         domain = self.domain_gen.generate_domains(self.csp.puzzle.clues)
-        variable_ordering = self.__order_variables(domain)
+        variable_ordering = self.__order_variables__(domain)
         assignment = {}
 
         while len(variable_ordering) > 0:

@@ -104,6 +104,7 @@ class Puzzle:
         self.__build_renderable_points()
         self.__build_solution_grid()
         self.__build_ans_lens()
+        self.__build_dep_graph()
 
     ## Fill in the answer into the result puzzle
     def answer(self, clueNum: str, answer: str, force_clear=False):
@@ -125,6 +126,16 @@ class Puzzle:
                     print('Answer does not fit in puzzle!')
                 elif force_clear or len(self.grid[r + i][c]) == 0:
                     self.grid[r + i][c] = answer[i]
+
+    def clear_answer(self, clueNum: str):
+        r, c = self.clue_inds[clueNum[:-1]]
+
+        if clueNum[-1] == "a":
+            for i in range(self.ans_lens[clueNum]):
+                self.grid[r][c + i] = ''
+        elif clueNum[-1] == "d":
+            for i in range(self.ans_lens[clueNum]):
+                self.grid[r + i][c] = ''
 
     def render(self, surface: pygame.Surface, wordFont: pygame.font.Font, numFont: pygame.font.Font):
         surface.fill('white')

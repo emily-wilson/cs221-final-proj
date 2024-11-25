@@ -1,6 +1,6 @@
 from classes.csp import CSP
 from classes.puzzle import Puzzle
-from learning.backjumping import Backjumping
+from learning.basic_backjumping import Backjumping
 from learning.baseline import Baseline
 import random
 

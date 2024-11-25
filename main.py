@@ -5,8 +5,9 @@ import utils
 from classes.csp import CSP
 from classes.puzzle import Puzzle
 from learning.a_star import AStarSearch
-from learning.backjumping import Backjumping
+from learning.basic_backjumping import BasicBackjumping
 from learning.baseline import Baseline
+from learning.double_backjumping import DoubleBackjumping
 import random
 
 # pygame setup
@@ -21,11 +22,12 @@ count = 1
 
 year = random.randint(1994, 2024)
 filename = f'data/{year}/{random.randint(1, 12)}-{random.randint(1, 28)}-{year}.json'
+# filename = f'data/2024/1-1-2024.json'
 print(filename)
 puzzle = Puzzle(filename)
 csp = CSP(puzzle)
 
-backjumping = Backjumping(csp)
+backjumping = DoubleBackjumping(csp)
 
 screen = pygame.display.set_mode(puzzle.getScreenSize())
 clock = pygame.time.Clock()
@@ -59,6 +61,6 @@ while running:
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    clock.tick(1)  # limits FPS to 60
+    clock.tick(30)  # limits FPS to 60
 
 pygame.quit()

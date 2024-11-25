@@ -40,7 +40,7 @@ class CSP:
         # print(f'available clues: {available_clues}')
         return random.choice(list(available_clues))
 
-    def compute_weight(self, var, val, assignment, sum_bin_constraints=False):
+    def compute_weight(self, var, val, assignment, sum_bin_constraints=False, count_empties=True):
         prod = 1
         if var in self.unary_constraints:
             for f in self.unary_constraints[var]:
@@ -49,15 +49,17 @@ class CSP:
         # print(f'binary constraints: {self.binary_constraints}')
         if var in self.binary_constraints:
             binary_constraints = self.binary_constraints[var]
-            print(f'binary constraints: {len(binary_constraints)}')
             for k, f in binary_constraints:
                 if k not in assignment:
-                    bin_const_sum += 1
+                    if count_empties:
+                        bin_const_sum += 1
+                    else:
+                        bin_const_sum += 0.5
                 elif sum_bin_constraints:
                     bin_const_sum += f(val, assignment[k])
                 else:
                     prod *= f(val, assignment[k])
-        print(f'var: {var}, val: {val}, sum: {bin_const_sum}')
+        # print(f'var: {var}, val: {val}, sum: {bin_const_sum}')
         if sum_bin_constraints:
             prod *= bin_const_sum
         return prod
