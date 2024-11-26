@@ -9,10 +9,16 @@ from learning.basic_backjumping import BasicBackjumping
 from learning.baseline import Baseline
 from learning.double_backjumping import DoubleBackjumping
 import random
+import json
 
 # pygame setup
 pygame.init()
 pygame.font.init()
+
+mondays = []
+with open("data/combined_metadata.json", 'r') as file:
+    object = json.load(file)
+    mondays = object["Monday"]
 
 baseline_ans_accs = 0
 baseline_grid_accs = 0
@@ -20,8 +26,10 @@ astar_ans_acc = 0
 astar_grid_acc = 0
 count = 1
 
-year = random.randint(1994, 2024)
-filename = f'data/{year}/{random.randint(1, 12)}-{random.randint(1, 28)}-{year}.json'
+# year = random.randint(2014, 2024)
+date = random.choice(mondays)
+year = date.split('-')[2]
+filename = f'data/{year}/{date}.json'
 # filename = f'data/2024/1-1-2024.json'
 print(filename)
 puzzle = Puzzle(filename)
@@ -43,9 +51,6 @@ while running:
     # fill the screen with a color to wipe away anything from last frame
     word_font = pygame.font.SysFont("arialunicode", utils.WORD_TEXT_SIZE)
     number_font = pygame.font.SysFont("arialunicode", utils.NUMBER_TEXT_SIZE)
-
-    text = word_font.render("hello", True, (255, 0, 0))
-    screen.blit(text, (100, 100))
 
     assignment = backjumping.solve_iter()
 

@@ -53,7 +53,7 @@ class BaselineDomainGenerator(LLMDomainGenerator):
         if partial_answer:
             completion = self.client.chat.completions.create(
                 model="gpt-4o-mini",
-                n=utils.MAX_TOKENS,
+                n=utils.MAX_RESPONSES,
                 messages=[
                     self.role,
                     {
@@ -62,7 +62,7 @@ class BaselineDomainGenerator(LLMDomainGenerator):
                     }],
             )
             # print(f'completion: {completion}')
-            for i in range(utils.MAX_TOKENS):
+            for i in range(utils.MAX_RESPONSES):
                 content = completion.choices[i].message.content.upper()
                 domain.add(''.join(letter for letter in content if letter.isalnum()))
             return domain
@@ -70,11 +70,11 @@ class BaselineDomainGenerator(LLMDomainGenerator):
         completion = self.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=self.__get_messages(clueKey, prevDomain),
-            n=utils.MAX_TOKENS,
+            n=utils.MAX_RESPONSES,
             frequency_penalty=2.0
         )
 
-        for i in range(utils.MAX_TOKENS):
+        for i in range(utils.MAX_RESPONSES):
             content = completion.choices[i].message.content.upper()
             domain.add(''.join(letter for letter in content if letter.isalnum()))
         return domain

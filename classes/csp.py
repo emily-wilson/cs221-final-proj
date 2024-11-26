@@ -40,7 +40,7 @@ class CSP:
         # print(f'available clues: {available_clues}')
         return random.choice(list(available_clues))
 
-    def compute_weight(self, var, val, assignment, sum_bin_constraints=False, count_empties=True):
+    def compute_weight(self, var, val, assignment, sum_bin_constraints=False, count_empties=True, flagged_answers = set()):
         prod = 1
         if var in self.unary_constraints:
             for f in self.unary_constraints[var]:
@@ -55,10 +55,14 @@ class CSP:
                         bin_const_sum += 1
                     else:
                         bin_const_sum += 0.5
-                elif sum_bin_constraints:
-                    bin_const_sum += f(val, assignment[k])
+                    continue
+                f_val = f(val, assignment[k])
+                if k in flagged_answers:
+                    f_val = 0.75 if f_val == 1 else 0.25
+                if sum_bin_constraints:
+                    bin_const_sum += f_val
                 else:
-                    prod *= f(val, assignment[k])
+                    prod *= f_val
         # print(f'var: {var}, val: {val}, sum: {bin_const_sum}')
         if sum_bin_constraints:
             prod *= bin_const_sum
@@ -76,3 +80,15 @@ class CSP:
                 if self.puzzle.grid[i][j] == self.puzzle.correct_grid[i][j]:
                     correct_square += 1
         return (correct_answers / len(self.puzzle.clues), correct_square / (len(self.puzzle.grid) * len(self.puzzle.grid[0])))
+
+    def getConflictingVars(self, var, val, assignment):
+        conflicting = []
+        if var in self.binary_constraints:
+            binary_constraints = self.binary_constraints[var]
+            for k, f in binary_constraints:
+                if k not in assignment:
+                    continue
+                p = f(val, assignment[k])
+                if p == 0:
+                    conflicting.append(k)
+        return conflicting

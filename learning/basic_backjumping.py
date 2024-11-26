@@ -9,7 +9,7 @@ class BasicBackjumping:
 
         self.domain = None
         self.i = None
-        self.potential_incorrect_answers = []
+        self.potential_incorrect_answers = set()
 
     def __setup_constraints(self):
         print(f'ans lens: {self.csp.puzzle.ans_lens}')
@@ -82,7 +82,7 @@ class BasicBackjumping:
                     max_p = (val, p)
             # print(f'max_p = {max_p}')
             if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                self.potential_incorrect_answers.append(var)
+                self.potential_incorrect_answers.add(var)
             else:
                 assignment[var] = max_p[0]
                 self.csp.puzzle.answer(var, max_p[0])
@@ -90,7 +90,7 @@ class BasicBackjumping:
         print(f'assignment: {assignment}, potential incorrect: {self.potential_incorrect_answers}')
         i = 1
         while i < 4 and len(self.potential_incorrect_answers) > 0:
-            new_flagged_answers = []
+            new_flagged_answers = set()
             for var in self.potential_incorrect_answers:
                 max_p = None
                 domain[var] = self.domain_gen.generate_single_domain(var, domain[var], self.csp.puzzle.getPartialAnswer(var))
@@ -114,7 +114,7 @@ class BasicBackjumping:
     def solve_iter(self):
         if self.domain is None:
             self.domain = self.domain_gen.generate_domains(self.csp.puzzle.clues)
-            self.variable_ordering = self.__order_variables(self.domain)
+            self.variable_ordering = self.__order_variables__(self.domain)
             self.assignment = {}
 
         if len(self.variable_ordering) > 0:
@@ -126,7 +126,7 @@ class BasicBackjumping:
                     max_p = (val, p)
             # print(f'max_p = {max_p}')
             if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                self.potential_incorrect_answers.append(var)
+                self.potential_incorrect_answers.add(var)
             else:
                 self.assignment[var] = max_p[0]
                 self.csp.puzzle.answer(var, max_p[0])
@@ -135,7 +135,7 @@ class BasicBackjumping:
         if self.i is None:
             print(f'assignment: {self.assignment}, potential incorrect: {self.potential_incorrect_answers}')
             self.i = 1
-            self.new_flagged_answers = []
+            self.new_flagged_answers = set()
 
         if self.i < 4 and len(self.potential_incorrect_answers) > 0:
             var = self.potential_incorrect_answers.pop()
@@ -150,7 +150,7 @@ class BasicBackjumping:
                     max_p = (val, p)
             # print(f'max_p: {max_p}')
             if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                self.new_flagged_answers.append(var)
+                self.new_flagged_answers.add(var)
             else:
                 self.assignment[var] = max_p[0]
                 self.csp.puzzle.answer(var, max_p[0])
