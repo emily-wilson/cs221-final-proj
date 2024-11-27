@@ -148,7 +148,7 @@ class Puzzle:
                     points = self.renderable_points[(i, j)]
                     pygame.gfxdraw.polygon(surface, points, (0, 0, 0))
                     if len(self.grid[i][j]) != 0:
-                        color = (0, 255, 0) if self.correct_grid[i][j] == self.grid[i][j] else (255, 0,0)
+                        color = (0, 0, 0) if self.correct_grid[i][j] == self.grid[i][j] else (255, 0,0)
                         w_s = wordFont.render(self.grid[i][j], True, color)
                         w_rect = w_s.get_rect()
                         w_rect.center = (points[0][0] + (0.5*utils.SQUARE_SIZE), points[0][1] + (0.5*utils.SQUARE_SIZE))
