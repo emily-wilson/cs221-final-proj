@@ -6,8 +6,8 @@ class DoubleBackjumping(BasicBackjumping):
     def __init__(self, csp: CSP):
         super().__init__(csp)
 
-    def __setup_constraints(self):
-        print(f'ans lens: {self.csp.puzzle.ans_lens}')
+    def __setup_constraints__(self):
+        print(f'setting up double backjumping constraints')
         def lens_match(word, exp):
             return 1 if len(word) == exp else 0
         def get_len_matcher(k):
@@ -32,10 +32,8 @@ class DoubleBackjumping(BasicBackjumping):
         def words_intersect(word1, word2, intersection):
             # print(word1, word2, intersection)
             if intersection[1] >= len(word1) or intersection[0] >= len(word2):
-                print(f'unequal word lens, w1: {word1}, w2: {word2}, intersection: {intersection}')
-                return 0.1
+                return 0
             if word1[intersection[1]] is None or word2[intersection[0]] is None:
-                print(f'one word missing letter? {word1[intersection[1]]}, {word2[intersection[0]]}')
                 return 1
 
             return 1 if word1[intersection[1]] == word2[intersection[0]] else 0
@@ -57,15 +55,14 @@ class DoubleBackjumping(BasicBackjumping):
             priority, var = self.variable_ordering.pop()
             max_p = None
             for val in self.domain[var]:
-                p = self.csp.compute_weight(var, val, self.assignment, sum_bin_constraints=True)
+                p = self.csp.compute_weight(var, val, self.assignment)
                 if max_p is None or p > max_p[1]:
                     max_p = (val, p)
             # print(f'max_p = {max_p}')
-            if max_p[1] < self.csp.puzzle.ans_lens[var]:
+            if max_p[1] < 1:
                 self.potential_incorrect_answers.add(var)
-            else:
-                self.assignment[var] = max_p[0]
-                self.csp.puzzle.answer(var, max_p[0])
+            self.assignment[var] = max_p[0]
+            self.csp.puzzle.answer(var, max_p[0])
             return None
 
         if self.i is None:
@@ -82,26 +79,27 @@ class DoubleBackjumping(BasicBackjumping):
             # print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
             # print(f'new domain: {domain[var]}')
             for val in self.domain[var]:
-                p = self.csp.compute_weight(var, val, self.assignment, sum_bin_constraints=True, flagged_answers = self.potential_incorrect_answers | self.new_flagged_answers)
+                p = self.csp.compute_weight(var, val, self.assignment, flagged_answers=self.potential_incorrect_answers | self.new_flagged_answers)
                 if max_p is None or p > max_p[1]:
                     max_p = (val, p)
-            if max_p[1] < self.csp.puzzle.ans_lens[var]:
+            if max_p[1] == 1:
+                # Found an answer that fits perfectly
+                self.assignment[var] = max_p[0]
+                self.csp.puzzle.answer(var, max_p[0], force_clear=True)
+            else:
                 print(f'max_p: {max_p}')
                 self.new_flagged_answers.add(var)
                 conflicting_vars = self.csp.getConflictingVars(var, max_p[0], self.assignment)
                 for key in conflicting_vars:
-                    if key in self.assignment:
-                        var_weight = self.csp.compute_weight(key, self.assignment[key], self.assignment, sum_bin_constraints=True, count_empties=False, flagged_answers = self.potential_incorrect_answers | self.new_flagged_answers)
-                        if var_weight < max_p[1] and key in self.potential_double_backjumps:
-                            print(f'key: {key}, val: {self.assignment[key]}, var weight: {var_weight}')
-                            del self.assignment[key]
-                            self.csp.puzzle.clear_answer(key)
-                            self.new_flagged_answers.add(key)
-                        elif key not in self.potential_double_backjumps:
-                            self.potential_double_backjumps.add(key)
-            else:
-                self.assignment[var] = max_p[0]
-                self.csp.puzzle.answer(var, max_p[0])
+                    var_weight = self.csp.compute_weight(key, self.assignment[key], self.assignment, flagged_answers=self.potential_incorrect_answers | self.new_flagged_answers)
+                    if var_weight < max_p[1]:
+                        print(f'key: {key}, val: {self.assignment[key]}, var weight: {var_weight}')
+                        del self.assignment[key]
+                        # self.csp.puzzle.clear_answer(key)
+                        self.new_flagged_answers.add(key)
+                        # add answer to assignment since it is more confident than a replacement
+                        self.assignment[var] = max_p[0]
+                        self.csp.puzzle.answer(var, max_p[0], force_clear=True)
             return None
         elif self.i < utils.MAX_ITER:
             self.i += 1

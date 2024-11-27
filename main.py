@@ -56,7 +56,6 @@ while running:
 
     if assignment is not None:
         ans_acc, grid_acc = csp.getAccuracy(assignment)
-        print(f'puzzle accuracy: {ans_acc},{grid_acc}')
 
         print(
             f'Backjumping: average grid acc: {grid_acc / count}, average ans acc: {ans_acc / count}, count: {count}')

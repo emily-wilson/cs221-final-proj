@@ -5,13 +5,13 @@ class BasicBackjumping:
     def __init__(self, csp):
         self.csp = csp
         self.domain_gen = BaselineDomainGenerator(csp.puzzle)
-        self.__setup_constraints()
+        self.__setup_constraints__()
 
         self.domain = None
         self.i = None
         self.potential_incorrect_answers = set()
 
-    def __setup_constraints(self):
+    def __setup_constraints__(self):
         print(f'ans lens: {self.csp.puzzle.ans_lens}')
         def lens_match(word, exp):
             return 1 if len(word) == exp else 0

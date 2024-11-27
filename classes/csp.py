@@ -58,7 +58,7 @@ class CSP:
                     continue
                 f_val = f(val, assignment[k])
                 if k in flagged_answers:
-                    f_val = 0.75 if f_val == 1 else 0.25
+                    f_val = 0.5
                 if sum_bin_constraints:
                     bin_const_sum += f_val
                 else:
@@ -89,6 +89,6 @@ class CSP:
                 if k not in assignment:
                     continue
                 p = f(val, assignment[k])
-                if p == 0:
+                if p != 1:
                     conflicting.append(k)
         return conflicting
