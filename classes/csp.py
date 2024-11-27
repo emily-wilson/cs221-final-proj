@@ -50,15 +50,18 @@ class CSP:
         if var in self.binary_constraints:
             binary_constraints = self.binary_constraints[var]
             for k, f in binary_constraints:
-                if k not in assignment:
+                w2 = ''
+                if k not in assignment and bin_const_sum:
                     if count_empties:
                         bin_const_sum += 1
                     else:
                         bin_const_sum += 0.5
                     continue
-                f_val = f(val, assignment[k])
+                elif k in assignment:
+                    w2 = assignment[k]
+                f_val = f(val, w2)
                 if k in flagged_answers:
-                    f_val = 0.5
+                    f_val = max(0.5, f_val)
                 if sum_bin_constraints:
                     bin_const_sum += f_val
                 else:
