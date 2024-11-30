@@ -6,7 +6,7 @@ class BaselineDomainGenerator(LLMDomainGenerator):
     def generate_domains(self, clueKeys, partialAnswers = {}, num_responses = 4):
         domains = {}
         for k in clueKeys:
-            print(f'prompt: {self.puzzle.ans_lens[k]} letter word for \"{self.puzzle.clues[k]}\"')
+            # print(f'prompt: {self.puzzle.ans_lens[k]} letter word for \"{self.puzzle.clues[k]}\"')
             completion = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[

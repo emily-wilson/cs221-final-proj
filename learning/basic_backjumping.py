@@ -5,13 +5,13 @@ class BasicBackjumping:
     def __init__(self, csp):
         self.csp = csp
         self.domain_gen = BaselineDomainGenerator(csp.puzzle)
-        self.__setup_constraints()
+        self.__setup_constraints__()
 
         self.domain = None
         self.i = None
         self.potential_incorrect_answers = set()
 
-    def __setup_constraints(self):
+    def __setup_constraints__(self):
         print(f'ans lens: {self.csp.puzzle.ans_lens}')
         def lens_match(word, exp):
             return 1 if len(word) == exp else 0
@@ -69,46 +69,9 @@ class BasicBackjumping:
         return variable_ordering
 
     def solve(self):
-        domain = self.domain_gen.generate_domains(self.csp.puzzle.clues)
-        variable_ordering = self.__order_variables__(domain)
-        assignment = {}
-
-        while len(variable_ordering) > 0:
-            priority, var = variable_ordering.pop()
-            max_p = None
-            for val in domain[var]:
-                p = self.csp.compute_weight(var, val, assignment, sum_bin_constraints=True)
-                if max_p is None or p > max_p[1]:
-                    max_p = (val, p)
-            # print(f'max_p = {max_p}')
-            if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                self.potential_incorrect_answers.add(var)
-            else:
-                assignment[var] = max_p[0]
-                self.csp.puzzle.answer(var, max_p[0])
-
-        print(f'assignment: {assignment}, potential incorrect: {self.potential_incorrect_answers}')
-        i = 1
-        while i < 4 and len(self.potential_incorrect_answers) > 0:
-            new_flagged_answers = set()
-            for var in self.potential_incorrect_answers:
-                max_p = None
-                domain[var] = self.domain_gen.generate_single_domain(var, domain[var], self.csp.puzzle.getPartialAnswer(var))
-                print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
-                # print(f'new domain: {domain[var]}')
-                for val in domain[var]:
-                    p = self.csp.compute_weight(var, val, assignment, sum_bin_constraints=True)
-                    if max_p is None or p > max_p[1]:
-                        max_p = (val, p)
-                print(f'max_p: {max_p}')
-                if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                    new_flagged_answers.append(var)
-                else:
-                    assignment[var] = max_p[0]
-                    self.csp.puzzle.answer(var, max_p[0])
-            i += 1
-            print(f'new flagged answers: ', new_flagged_answers)
-            self.potential_incorrect_answers = new_flagged_answers
+        assignment = self.solve_iter()
+        while assignment is None:
+            assignment = self.solve_iter()
         return assignment
 
     def solve_iter(self):

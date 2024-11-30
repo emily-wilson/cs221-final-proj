@@ -40,32 +40,27 @@ class CSP:
         # print(f'available clues: {available_clues}')
         return random.choice(list(available_clues))
 
-    def compute_weight(self, var, val, assignment, sum_bin_constraints=False, count_empties=True, flagged_answers = set()):
+    def compute_weight(self, var, val, assignment, flagged_answers = set()):
         prod = 1
         if var in self.unary_constraints:
             for f in self.unary_constraints[var]:
                 prod *= f(val)
-        bin_const_sum = 0
+        bin_const_sum = 0.0
         # print(f'binary constraints: {self.binary_constraints}')
         if var in self.binary_constraints:
             binary_constraints = self.binary_constraints[var]
             for k, f in binary_constraints:
-                if k not in assignment:
-                    if count_empties:
-                        bin_const_sum += 1
-                    else:
-                        bin_const_sum += 0.5
-                    continue
-                f_val = f(val, assignment[k])
-                if k in flagged_answers:
-                    f_val = 0.75 if f_val == 1 else 0.25
-                if sum_bin_constraints:
-                    bin_const_sum += f_val
-                else:
-                    prod *= f_val
+                w2 = None
+                if k in assignment:
+                    w2 = assignment[k]
+                f_val = f(val, w2)
+                # if k in flagged_answers:
+                #     f_val = 0.75 if f_val == 1 else 0.25
+                bin_const_sum += f_val
+        # bin_const_sum = max(bin_const_sum, 1)
+        bin_const_sum /= self.puzzle.ans_lens[var]
         # print(f'var: {var}, val: {val}, sum: {bin_const_sum}')
-        if sum_bin_constraints:
-            prod *= bin_const_sum
+        prod *= bin_const_sum
         return prod
 
     def getAccuracy(self, assignment):
