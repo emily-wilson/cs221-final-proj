@@ -3,8 +3,8 @@ from classes.puzzle import Puzzle
 from classes.csp import CSP
 
 class Baseline:
-    def __init__(self, csp: CSP):
-        self.domain_gen = BaselineDomainGenerator(csp.puzzle)
+    def __init__(self, csp: CSP, temperature = 1.0):
+        self.domain_gen = BaselineDomainGenerator(csp.puzzle, temperature)
         self.csp = csp
 
 

@@ -1,17 +1,21 @@
 # Example file showing a basic pygame "game loop"
 import pygame
 
-import utils
+from util import utils
 from classes.csp import CSP
 from classes.puzzle import Puzzle
-from learning.a_star import AStarSearch
-from learning.backjumping import Backjumping
-from learning.baseline import Baseline
+from learning.double_backjumping import DoubleBackjumping
 import random
+import json
 
 # pygame setup
 pygame.init()
 pygame.font.init()
+
+mondays = []
+with open("data/combined_metadata.json", 'r') as file:
+    object = json.load(file)
+    mondays = object["Monday"]
 
 baseline_ans_accs = 0
 baseline_grid_accs = 0
@@ -19,11 +23,16 @@ astar_ans_acc = 0
 astar_grid_acc = 0
 count = 1
 
-filename = f'data/2024/1-1-2024.json'
+# year = random.randint(2014, 2024)
+year = 2024
+date = random.choice(mondays[f'{year}'])
+filename = f'data/{year}/{date}.json'
+# filename = f'data/2024/1-1-2024.json'
+print(filename)
 puzzle = Puzzle(filename)
 csp = CSP(puzzle)
 
-backjumping = Backjumping(csp)
+backjumping = DoubleBackjumping(csp)
 
 screen = pygame.display.set_mode(puzzle.getScreenSize())
 clock = pygame.time.Clock()
@@ -40,9 +49,6 @@ while running:
     word_font = pygame.font.SysFont("arialunicode", utils.WORD_TEXT_SIZE)
     number_font = pygame.font.SysFont("arialunicode", utils.NUMBER_TEXT_SIZE)
 
-    text = word_font.render("hello", True, (255, 0, 0))
-    screen.blit(text, (100, 100))
-
     assignment = backjumping.solve_iter()
 
     if assignment is not None:
@@ -57,6 +63,6 @@ while running:
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    clock.tick(1)  # limits FPS to 60
+    clock.tick(5)  # limits FPS to 60
 
 pygame.quit()

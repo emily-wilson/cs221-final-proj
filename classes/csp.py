@@ -1,5 +1,3 @@
-from os import uname
-from turtledemo.penrose import start
 from typing import Callable
 import random
 from classes.puzzle import Puzzle
@@ -40,26 +38,27 @@ class CSP:
         # print(f'available clues: {available_clues}')
         return random.choice(list(available_clues))
 
-    def compute_weight(self, var, val, assignment, sum_bin_constraints=False):
+    def compute_weight(self, var, val, assignment, flagged_answers = set()):
         prod = 1
         if var in self.unary_constraints:
             for f in self.unary_constraints[var]:
                 prod *= f(val)
-        bin_const_sum = 0
+        bin_const_sum = 0.0
         # print(f'binary constraints: {self.binary_constraints}')
         if var in self.binary_constraints:
             binary_constraints = self.binary_constraints[var]
-            print(f'binary constraints: {len(binary_constraints)}')
             for k, f in binary_constraints:
-                if k not in assignment:
-                    bin_const_sum += 1
-                elif sum_bin_constraints:
-                    bin_const_sum += f(val, assignment[k])
-                else:
-                    prod *= f(val, assignment[k])
-        print(f'var: {var}, val: {val}, sum: {bin_const_sum}')
-        if sum_bin_constraints:
-            prod *= bin_const_sum
+                w2 = None
+                if k in assignment:
+                    w2 = assignment[k]
+                f_val = f(val, w2)
+                # if k in flagged_answers:
+                #     f_val = 0.75 if f_val == 1 else 0.25
+                bin_const_sum += f_val
+        # bin_const_sum = max(bin_const_sum, 1)
+        bin_const_sum /= self.puzzle.ans_lens[var]
+        # print(f'var: {var}, val: {val}, sum: {bin_const_sum}')
+        prod *= bin_const_sum
         return prod
 
     def getAccuracy(self, assignment):
@@ -74,3 +73,15 @@ class CSP:
                 if self.puzzle.grid[i][j] == self.puzzle.correct_grid[i][j]:
                     correct_square += 1
         return (correct_answers / len(self.puzzle.clues), correct_square / (len(self.puzzle.grid) * len(self.puzzle.grid[0])))
+
+    def getConflictingVars(self, var, val, assignment):
+        conflicting = []
+        if var in self.binary_constraints:
+            binary_constraints = self.binary_constraints[var]
+            for k, f in binary_constraints:
+                if k not in assignment:
+                    continue
+                p = f(val, assignment[k])
+                if p == 0:
+                    conflicting.append(k)
+        return conflicting
