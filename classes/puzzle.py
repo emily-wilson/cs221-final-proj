@@ -1,6 +1,6 @@
 import json
 import pygame
-import utils
+import util.utils as utils
 import pygame.gfxdraw
 
 class Puzzle:
