@@ -1,12 +1,13 @@
 from classes.llm_domain_generator import LLMDomainGenerator
 import utils
+from unidecode import unidecode
 
 
 class BaselineDomainGenerator(LLMDomainGenerator):
     def generate_domains(self, clueKeys, partialAnswers = {}, num_responses = 4):
         domains = {}
         for k in clueKeys:
-            # print(f'prompt: {self.puzzle.ans_lens[k]} letter word for \"{self.puzzle.clues[k]}\"')
+            print(f'prompt: {self.puzzle.ans_lens[k]} letter word for \"{self.puzzle.clues[k]}\"')
             completion = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
@@ -18,9 +19,11 @@ class BaselineDomainGenerator(LLMDomainGenerator):
                 ],
                 n = num_responses,
             )
+            # print(k)
             domains[k] = set()
             for i in range(num_responses):
-                content = completion.choices[i].message.content.upper()
+                content = unidecode(completion.choices[i].message.content).upper()
+                # print(content)
                 domains[k].add(''.join(letter for letter in content if letter.isalnum()))
         # print(domains)
         return domains
@@ -47,7 +50,7 @@ class BaselineDomainGenerator(LLMDomainGenerator):
         return longest
 
     def generate_single_domain(self, clueKey, prevDomain, partial_answer=None):
-        # print(f'regenerating single domain for \"{self.puzzle.clues[clueKey]}\"')
+        print(f'regenerating single domain for \"{self.puzzle.clues[clueKey]}\"')
         # print(self.__get_messages(clueKey, prevDomain))
         domain = set()
         if partial_answer:
@@ -60,10 +63,11 @@ class BaselineDomainGenerator(LLMDomainGenerator):
                         "role": "user",
                         "content": f'{self.puzzle.ans_lens[clueKey]} letter word for \"{self.puzzle.clues[clueKey]}\" containing the substring \"{self.__get_longest_partial_substring(partial_answer)}\"'
                     }],
+                presence_penalty=2.0,
             )
             # print(f'completion: {completion}')
             for i in range(utils.MAX_RESPONSES):
-                content = completion.choices[i].message.content.upper()
+                content = unidecode(completion.choices[i].message.content).upper()
                 domain.add(''.join(letter for letter in content if letter.isalnum()))
             return domain
 
@@ -71,10 +75,10 @@ class BaselineDomainGenerator(LLMDomainGenerator):
             model="gpt-4o-mini",
             messages=self.__get_messages(clueKey, prevDomain),
             n=utils.MAX_RESPONSES,
-            frequency_penalty=2.0
+            presence_penalty=2.0,
         )
 
         for i in range(utils.MAX_RESPONSES):
-            content = completion.choices[i].message.content.upper()
+            content = unidecode(completion.choices[i].message.content).upper()
             domain.add(''.join(letter for letter in content if letter.isalnum()))
         return domain

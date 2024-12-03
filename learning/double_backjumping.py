@@ -3,8 +3,8 @@ from learning.basic_backjumping import BasicBackjumping
 from classes.csp import CSP
 
 class DoubleBackjumping(BasicBackjumping):
-    def __init__(self, csp: CSP):
-        super().__init__(csp)
+    def __init__(self, csp: CSP, temperature = 1.0):
+        super().__init__(csp, temperature)
         self.assignment_weights = {}
 
     def __setup_constraints__(self):
@@ -86,8 +86,10 @@ class DoubleBackjumping(BasicBackjumping):
             new_domain = set()
             # print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
             # print(f'new domain: {domain[var]}')
+            # print(f'key: {var}, clue: {self.csp.puzzle.clues[var]}')
             for val in self.domain[var]:
                 p = self.csp.compute_weight(var, val, self.assignment, flagged_answers = self.potential_incorrect_answers | self.new_flagged_answers)
+                # print(f'val: {val}, p: {p}')
                 if max_p is None or p > max_p[1]:
                     max_p = (val, p)
                 if p > 0:

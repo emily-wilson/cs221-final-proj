@@ -27,8 +27,8 @@ astar_grid_acc = 0
 count = 1
 
 # year = random.randint(2014, 2024)
-date = random.choice(mondays)
-year = date.split('-')[2]
+year = 2024
+date = random.choice(mondays[f'{year}'])
 filename = f'data/{year}/{date}.json'
 # filename = f'data/2024/1-1-2024.json'
 print(filename)

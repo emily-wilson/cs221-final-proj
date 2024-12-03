@@ -2,9 +2,9 @@ from classes.baseline_domain_generator import BaselineDomainGenerator
 from classes.priority_queue import PriorityQueue
 
 class BasicBackjumping:
-    def __init__(self, csp):
+    def __init__(self, csp, temperature):
         self.csp = csp
-        self.domain_gen = BaselineDomainGenerator(csp.puzzle)
+        self.domain_gen = BaselineDomainGenerator(csp.puzzle, temperature)
         self.__setup_constraints__()
 
         self.domain = None
