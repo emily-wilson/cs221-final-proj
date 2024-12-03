@@ -1,17 +1,17 @@
 from classes.baseline_domain_generator import BaselineDomainGenerator
 from classes.priority_queue import PriorityQueue
 
-class Backjumping:
-    def __init__(self, csp):
+class BasicBackjumping:
+    def __init__(self, csp, temperature):
         self.csp = csp
-        self.domain_gen = BaselineDomainGenerator(csp.puzzle)
-        self.__setup_constraints()
+        self.domain_gen = BaselineDomainGenerator(csp.puzzle, temperature)
+        self.__setup_constraints__()
 
         self.domain = None
         self.i = None
-        self.potential_incorrect_answers = []
+        self.potential_incorrect_answers = set()
 
-    def __setup_constraints(self):
+    def __setup_constraints__(self):
         print(f'ans lens: {self.csp.puzzle.ans_lens}')
         def lens_match(word, exp):
             return 1 if len(word) == exp else 0
@@ -42,11 +42,8 @@ class Backjumping:
                             continue
                         if m not in dep_graph:
                             dep_graph[m] = set()
-                        # if n not in dep_graph:
-                        #     dep_graph[n] = set()
                         intersection = self.csp.puzzle.getIntersection(m, n)
                         dep_graph[m].add((n, intersection))
-                        # dep_graph[n].add((m, intersection))
         print(f'dep graph: {dep_graph}')
 
         def words_intersect(word1, word2, intersection):
@@ -65,59 +62,22 @@ class Backjumping:
             for v2, intersection in dep_graph[v1]:
                 self.csp.add_binary_constraint(v1, v2, get_intersection_lambda(intersection))
 
-    def __order_variables(self, domain):
+    def __order_variables__(self, domain):
         variable_ordering = PriorityQueue()
         for variable in domain.keys():
             variable_ordering.push(-len(domain[variable]), variable)
         return variable_ordering
 
     def solve(self):
-        domain = self.domain_gen.generate_domains(self.csp.puzzle.clues)
-        variable_ordering = self.__order_variables(domain)
-        assignment = {}
-
-        while len(variable_ordering) > 0:
-            priority, var = variable_ordering.pop()
-            max_p = None
-            for val in domain[var]:
-                p = self.csp.compute_weight(var, val, assignment, sum_bin_constraints=True)
-                if max_p is None or p > max_p[1]:
-                    max_p = (val, p)
-            # print(f'max_p = {max_p}')
-            if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                self.potential_incorrect_answers.append(var)
-            else:
-                assignment[var] = max_p[0]
-                self.csp.puzzle.answer(var, max_p[0])
-
-        print(f'assignment: {assignment}, potential incorrect: {self.potential_incorrect_answers}')
-        i = 1
-        while i < 4 and len(self.potential_incorrect_answers) > 0:
-            new_flagged_answers = []
-            for var in self.potential_incorrect_answers:
-                max_p = None
-                domain[var] = self.domain_gen.generate_single_domain(var, domain[var], self.csp.puzzle.getPartialAnswer(var))
-                print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
-                # print(f'new domain: {domain[var]}')
-                for val in domain[var]:
-                    p = self.csp.compute_weight(var, val, assignment, sum_bin_constraints=True)
-                    if max_p is None or p > max_p[1]:
-                        max_p = (val, p)
-                print(f'max_p: {max_p}')
-                if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                    new_flagged_answers.append(var)
-                else:
-                    assignment[var] = max_p[0]
-                    self.csp.puzzle.answer(var, max_p[0])
-            i += 1
-            print(f'new flagged answers: ', new_flagged_answers)
-            self.potential_incorrect_answers = new_flagged_answers
+        assignment = self.solve_iter()
+        while assignment is None:
+            assignment = self.solve_iter()
         return assignment
 
     def solve_iter(self):
         if self.domain is None:
             self.domain = self.domain_gen.generate_domains(self.csp.puzzle.clues)
-            self.variable_ordering = self.__order_variables(self.domain)
+            self.variable_ordering = self.__order_variables__(self.domain)
             self.assignment = {}
 
         if len(self.variable_ordering) > 0:
@@ -129,7 +89,7 @@ class Backjumping:
                     max_p = (val, p)
             # print(f'max_p = {max_p}')
             if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                self.potential_incorrect_answers.append(var)
+                self.potential_incorrect_answers.add(var)
             else:
                 self.assignment[var] = max_p[0]
                 self.csp.puzzle.answer(var, max_p[0])
@@ -138,22 +98,22 @@ class Backjumping:
         if self.i is None:
             print(f'assignment: {self.assignment}, potential incorrect: {self.potential_incorrect_answers}')
             self.i = 1
-            self.new_flagged_answers = []
+            self.new_flagged_answers = set()
 
         if self.i < 4 and len(self.potential_incorrect_answers) > 0:
             var = self.potential_incorrect_answers.pop()
             max_p = None
             self.domain[var] = self.domain_gen.generate_single_domain(var, self.domain[var],
                                                                  self.csp.puzzle.getPartialAnswer(var))
-            print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
+            # print(f'partial: {self.csp.puzzle.getPartialAnswer(var)}')
             # print(f'new domain: {domain[var]}')
             for val in self.domain[var]:
                 p = self.csp.compute_weight(var, val, self.assignment, sum_bin_constraints=True)
                 if max_p is None or p > max_p[1]:
                     max_p = (val, p)
-            print(f'max_p: {max_p}')
+            # print(f'max_p: {max_p}')
             if max_p[1] < self.csp.puzzle.ans_lens[var]:
-                self.new_flagged_answers.append(var)
+                self.new_flagged_answers.add(var)
             else:
                 self.assignment[var] = max_p[0]
                 self.csp.puzzle.answer(var, max_p[0])
