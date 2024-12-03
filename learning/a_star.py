@@ -1,6 +1,5 @@
-import utils
+from util import utils
 from classes.baseline_domain_generator import BaselineDomainGenerator
-import random
 
 from classes.priority_queue import PriorityQueue
 
