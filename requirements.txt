@@ -1,3 +1,4 @@
 unidecode
 openai
 pygame
+python-dotenv

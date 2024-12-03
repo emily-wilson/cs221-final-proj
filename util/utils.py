@@ -1,0 +1,10 @@
+SQUARE_SIZE = 40
+NUMBER_TEXT_SIZE = 10
+WORD_TEXT_SIZE = 14
+MAX_RESPONSES = 5
+
+MAX_ITER = 20
+
+# constants for walksat impl
+HARD_SAT_WEIGHT = 1000
+ETA = 0.7

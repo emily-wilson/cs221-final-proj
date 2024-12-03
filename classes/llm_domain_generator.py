@@ -2,12 +2,14 @@ from util import utils
 from openai import OpenAI
 from classes.puzzle import Puzzle
 import os
+from dotenv import load_dotenv
 
 class LLMDomainGenerator:
     def __init__(self, puzzle: Puzzle, temperature = 1.0):
-        os.environ["OPENAI_API_KEY"] = utils.OPEN_AI_SECRET_KEY
+        load_dotenv()
+        os.environ["OPENAI_API_KEY"] = os.getenv("OPEN_AI_SECRET_KEY")
         self.client = OpenAI(
-            organization=utils.OPEN_AI_ORGANIZATION,
+            organization=os.getenv("OPEN_AI_ORGANIZATION"),
             project='proj_Xi8Kcx1pD0syGhs2B5oGRjED'
         )
         self.puzzle = puzzle
