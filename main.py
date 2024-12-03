@@ -1,12 +1,9 @@
 # Example file showing a basic pygame "game loop"
 import pygame
 
-import utils
+from util import utils
 from classes.csp import CSP
 from classes.puzzle import Puzzle
-from learning.a_star import AStarSearch
-from learning.basic_backjumping import BasicBackjumping
-from learning.baseline import Baseline
 from learning.double_backjumping import DoubleBackjumping
 import random
 import json

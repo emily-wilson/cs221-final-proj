@@ -1,5 +1,5 @@
 from classes.llm_domain_generator import LLMDomainGenerator
-import utils
+from util import utils
 from unidecode import unidecode
 
 

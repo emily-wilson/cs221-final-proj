@@ -1,4 +1,4 @@
-import utils
+from util import utils
 from learning.basic_backjumping import BasicBackjumping
 from classes.csp import CSP
 

@@ -1,4 +1,4 @@
-import utils
+from util import utils
 from openai import OpenAI
 from classes.puzzle import Puzzle
 import os

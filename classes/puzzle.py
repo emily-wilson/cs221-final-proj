@@ -1,6 +1,6 @@
 import json
 import pygame
-import utils
+from util import utils
 import pygame.gfxdraw
 
 class Puzzle:
@@ -159,16 +159,16 @@ class Puzzle:
                         color = (0, 0, 0) if self.correct_grid[i][j] == self.grid[i][j] else (255, 0,0)
                         w_s = wordFont.render(self.grid[i][j], True, color)
                         w_rect = w_s.get_rect()
-                        w_rect.center = (points[0][0] + (0.5*utils.SQUARE_SIZE), points[0][1] + (0.5*utils.SQUARE_SIZE))
+                        w_rect.center = (points[0][0] + (0.5 * utils.SQUARE_SIZE), points[0][1] + (0.5 * utils.SQUARE_SIZE))
                         surface.blit(w_s, w_rect)
                     if len(self.numbers[i][j]) != 0:
                         n_s = numFont.render(self.numbers[i][j], True, (0, 0, 0))
                         n_rect = n_s.get_rect()
-                        n_rect.center = (points[0][0] + (0.2*utils.SQUARE_SIZE), points[0][1] + (0.2*utils.SQUARE_SIZE))
+                        n_rect.center = (points[0][0] + (0.2 * utils.SQUARE_SIZE), points[0][1] + (0.2 * utils.SQUARE_SIZE))
                         surface.blit(n_s, n_rect)
 
     def getScreenSize(self):
-        return (len(self.grid[0])*utils.SQUARE_SIZE, len(self.grid) * utils.SQUARE_SIZE)
+        return (len(self.grid[0]) * utils.SQUARE_SIZE, len(self.grid) * utils.SQUARE_SIZE)
 
     # Gets point where 2 clues intersect in form (clue1_ind, clue2_ind)
     def getIntersection(self, clue1: str, clue2: str) -> tuple:
