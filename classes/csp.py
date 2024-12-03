@@ -1,5 +1,3 @@
-from os import uname
-from turtledemo.penrose import start
 from typing import Callable
 import random
 from classes.puzzle import Puzzle
